@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tags</title>
+    <style>
+        #tag-form {
+            background: #f3f3f3;
+            padding: 20px;
+            max-width: 400px;
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .form-group input {
+            display: block;
+            width: 100%;
+            padding: 8px 15px;
+            margin-bottom: 10px;
+            border: 2px solid #222;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        #submit-btn {
+            background: #1a7def;
+            color: #fff;
+            border: 0 none;
+            padding: 8px 20px;
+            border-radius: 3px;
+        }
+
+        #tag-groups {
+            max-width: 400px;
+        }
+
+        .tag {
+            background: #222;
+            border: 0 none;
+            color: #fff;
+            padding: 10px 31px 10px 15px;
+            border-radius: 3px;
+            position: relative;
+            margin: 2px;
+        }
+
+        .tag .remove {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #dd1b1b;
+            height: 100%;
+            width: 24px;
+            border-radius: 0 3px 3px 0;
+            cursor: pointer;
+            line-height: 32px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form action="" id="tag-form">
+        <div class="form-group">
+            <label for="tag">Tags</label>
+            <input type="text" id="tag" name="tag" />
+        </div>
+        <button class="btn" id="submit-btn">Create</button>
+    </form>
+
+    <div id="tag-groups">
+
+    </div>
+
+    <script>
+        //global functions
+        Storage.prototype.setObject = function (key, value) {
+            return this.setItem(key, JSON.stringify(value));
+        }
+
+        Storage.prototype.getObject = function (key) {
+            return JSON.parse(this.getItem(key));
+        }
+
+
+        //selector
+        const tagGroup = document.querySelector("#tag-groups");
+        const tagForm = document.querySelector("#tag-form");
+        const defaultValues =  [];
+
+        const tagData = localStorage.getObject("tags"); //null
+
+        const tags = (tagData !== null && tagData.length) ? tagData : defaultValues;
+
+        //tag create
+        tagForm.addEventListener("submit", function(e) {
+            const tagInput  = e.target.elements.tag;
+
+            if ( tagInput.value ) {
+                tags.push(tagInput.value);
+                localStorage.setObject("tags", tags);
+                renderShowTags();
+                tagInput.value = '';
+            }
+            e.preventDefault();
+        });
+
+        //remove tag
+        tagGroup.addEventListener("click", function(event) {
+            if ( event.target.classList.contains('remove')  ) {
+                const button = event.target.parentElement;
+                const index = [... tagGroup.children].indexOf(button);
+                
+                tags.splice(index, 1);
+                localStorage.setObject("tags", tags);
+                button.remove();            
+            }
+
+        });
+
+        //
+
+        //show tags 
+        renderShowTags();
+        function renderShowTags() {
+            if (tags !== null && tags.length) {
+                const fragment = new DocumentFragment();
+                tagGroup.innerHTML = '';
+                tags.forEach(function (tag) {
+                    const buttonTag = document.createElement("button");
+                    buttonTag.classList.add("tag");
+
+                    // const textTag = document.createElement("span");
+                    // textTag.classList.add("text");
+                    // textTag.textContent = tag;
+
+                    // const removeTag = document.createElement("span");
+                    // removeTag.classList.add("remove");
+                    // removeTag.textContent = "x";
+
+                    // buttonTag.appendChild(textTag);
+                    // buttonTag.appendChild(removeTag);
+
+                    buttonTag.innerHTML = `<span class="text">${tag}</span><span class="remove">x</span>`;
+
+                    fragment.appendChild(buttonTag);
+
+                });
+
+                tagGroup.appendChild(fragment);
+
+            }
+        }
+
+
+        //sample data
+        const data = [
+            {
+                id: 1,
+                name: "CSS",
+                label: "CSS Design"
+            },
+            {
+                id: 2,
+                name: "HTML"
+            },
+            {
+                id: 3,
+                name: "CSS3"
+            }
+        ]
+
+
+        // create
+        // remove
+    </script>
+</body>
+
+</html>
